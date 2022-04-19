@@ -1,0 +1,42 @@
+name: Format Terraform
+
+on:
+  pull_request:
+  
+  workflow_dispatch:
+  
+jobs:
+  terraform-lint:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - uses: actions/cache@v2
+      name: Cache plugin dir
+      with:
+        path: ~/.tflint.d/plugins
+        key: ${{ matrix.os }}-tflint-${{ hashFiles('.tflint.hcl') }}
+
+    - uses: terraform-linters/setup-tflint@v1
+      name: Setup TFLint
+      with:
+        tflint_version: v0.29.0
+
+    - name: Show version
+      run: tflint --version
+
+    - name: Init TFLint
+      run: tflint --init
+
+    - name: Run TFLint
+      run: tflint -f compact
+
+    - name: Commit changes to repo
+      uses: stefanzweifel/git-auto-commit-action@v4
+      with:
+        commit_message: "[AUTO-FORMAT] Fixed terraform formatting"
+        commit_options: '--no-verify --signoff'
+        push_options: '--force'
+        branch: ${{ github.head_ref }}
