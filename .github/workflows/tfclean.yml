@@ -12,17 +12,6 @@ jobs:
     steps:
     - name: Checkout
       uses: actions/checkout@v2
-      
-    - name: Format HCL files
-      uses: devops-infra/action-format-hcl@v0.2
-      
-    - name: Commit changes to repo
-      uses: stefanzweifel/git-auto-commit-action@v4
-      with:
-        commit_message: "[AUTO-FORMAT-HCL] Fixed HCL formatting"
-        commit_options: '--no-verify --signoff'
-        push_options: '--force'
-        branch: ${{ github.head_ref }}
 
     - uses: actions/cache@v2
       name: Cache plugin dir
@@ -43,7 +32,6 @@ jobs:
 
     - name: Run TFLint
       run: tflint -f compact
-
         
     - name: Terraform security scan
       uses: triat/terraform-security-scan@v3.0.0
